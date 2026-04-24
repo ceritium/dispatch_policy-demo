@@ -24,7 +24,7 @@ class TenantWorkJob < ApplicationJob
   end
 
   def perform(account_id:, task:)
-    sleep(0.2)
+    # sleep(0.2)
     JobRun.create!(
       job_class:  self.class.name,
       account_id: account_id,
