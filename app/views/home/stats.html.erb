@@ -1,49 +1,24 @@
-<% content_for :head do %>
-  <meta http-equiv="refresh" content="3">
+<h1>Live stats <small class="muted">(auto-refresh every 2s)</small></h1>
+
+<div class="live-panel" data-poll="/stats.json" data-renderer="live-stats">Loading…</div>
+
+<h2>Recent runs (last 50)</h2>
+<% if @recent.empty? %>
+  <p class="muted">Nothing has run yet. Enqueue something from the home page.</p>
+<% else %>
+  <table>
+    <thead>
+      <tr><th>Job</th><th>Account</th><th>Payload</th><th>Ran at</th></tr>
+    </thead>
+    <tbody>
+      <% @recent.each do |r| %>
+        <tr>
+          <td><code><%= r.job_class %></code></td>
+          <td><%= r.account_id || "—" %></td>
+          <td><code><%= r.payload.to_json %></code></td>
+          <td><%= r.ran_at %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 <% end %>
-
-<h1>Live stats <small class="muted">(auto-refresh every 3s)</small></h1>
-
-<div class="two-col">
-  <div>
-    <h2>Policy status</h2>
-    <table>
-      <thead>
-        <tr><th>Job class</th><th>Pending</th><th>Admitted</th><th>Completed (24h)</th></tr>
-      </thead>
-      <tbody>
-        <% @counts.each do |row| %>
-          <tr>
-            <td><code><%= row[:name] %></code></td>
-            <td><%= row[:pending] %></td>
-            <td><%= row[:admitted] %></td>
-            <td><%= row[:completed] %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-
-  <div>
-    <h2>Recent runs (last 50)</h2>
-    <% if @recent.empty? %>
-      <p class="muted">Nothing has run yet. Enqueue something from the home page.</p>
-    <% else %>
-      <table>
-        <thead>
-          <tr><th>Job</th><th>Account</th><th>Payload</th><th>Ran at</th></tr>
-        </thead>
-        <tbody>
-          <% @recent.each do |r| %>
-            <tr>
-              <td><code><%= r.job_class %></code></td>
-              <td><%= r.account_id || "—" %></td>
-              <td><code><%= r.payload.to_json %></code></td>
-              <td><%= r.ran_at.to_s %></td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    <% end %>
-  </div>
-</div>

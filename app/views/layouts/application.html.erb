@@ -13,7 +13,7 @@
       nav { margin-bottom: 1.5em; }
       nav a { margin-right: 1em; text-decoration: none; color: #0057b7; }
       table { border-collapse: collapse; width: 100%; margin-top: 0.5em; }
-      th, td { text-align: left; padding: 0.4em 0.6em; border-bottom: 1px solid #eee; }
+      th, td { text-align: left; padding: 0.4em 0.6em; border-bottom: 1px solid #eee; font-size: 0.9em; }
       th { font-size: 0.8em; text-transform: uppercase; color: #666; letter-spacing: 0.02em; }
       form.dispatch { background: #f7f7fa; border: 1px solid #ddd; border-radius: 6px; padding: 0.8em 1em; margin-bottom: 1em; }
       form.dispatch h3 { margin: 0 0 0.3em; font-size: 1em; }
@@ -23,13 +23,17 @@
       form.dispatch input, form.dispatch select { font: inherit; padding: 0.3em 0.4em; border: 1px solid #ccc; border-radius: 3px; min-width: 5em; }
       form.dispatch button { font: inherit; padding: 0.5em 1em; border: 0; background: #0057b7; color: #fff; border-radius: 3px; cursor: pointer; }
       form.dispatch button:hover { background: #003d80; }
-      .flash { padding: 0.6em 0.8em; border-radius: 4px; margin-bottom: 1em; }
+      .flash { padding: 0.6em 0.8em; border-radius: 4px; margin-bottom: 1em; transition: opacity 0.3s; }
       .flash.notice { background: #e6f4ea; color: #226335; border: 1px solid #c5e1cd; }
       .flash.alert  { background: #fde7e7; color: #8b2020; border: 1px solid #f2b8b8; }
+      .flash.hidden { display: none; }
       .muted { color: #888; }
       code { background: #f0f0f3; padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.9em; }
       .two-col { display: flex; gap: 2em; flex-wrap: wrap; }
       .two-col > div { flex: 1; min-width: 320px; }
+      .live-panel { background: #fafbff; border: 1px solid #dce1f0; border-radius: 6px; padding: 0.8em 1em; margin-bottom: 1.5em; }
+      .live-panel h2 { margin: 0 0 0.4em; font-size: 1em; border: 0; padding: 0; }
+      .live-panel .updated { font-size: 0.75em; color: #888; float: right; }
     </style>
   </head>
   <body>
@@ -40,10 +44,77 @@
       <%= link_to "GoodJob dashboard", good_job_path %>
     </nav>
 
+    <div id="flash" class="flash hidden" role="status"></div>
+
     <% flash.each do |key, msg| %>
       <div class="flash <%= key %>"><%= msg %></div>
     <% end %>
 
     <%= yield %>
+
+    <script>
+      (function () {
+        const flashEl = document.getElementById("flash");
+        function showFlash(msg, kind) {
+          flashEl.classList.remove("hidden");
+          flashEl.className = "flash " + kind;
+          flashEl.textContent = msg;
+          clearTimeout(flashEl._t);
+          flashEl._t = setTimeout(() => flashEl.classList.add("hidden"), 4000);
+        }
+
+        document.addEventListener("submit", function (ev) {
+          const form = ev.target;
+          if (!form.classList.contains("dispatch")) return;
+          ev.preventDefault();
+          const data = new FormData(form);
+          fetch(form.action, {
+            method: form.method,
+            body: data,
+            headers: { "Accept": "application/json" }
+          }).then(r => r.ok ? r.json() : Promise.reject(r.statusText))
+            .then(body => {
+              showFlash(body.notice, "notice");
+              refreshAll();
+            })
+            .catch(err => showFlash("Request failed: " + err, "alert"));
+        });
+
+        const renderers = {
+          "live-stats": function (data) {
+            const counts = data.counts.map(c =>
+              `<tr><td><code>${c.name}</code></td><td>${c.pending}</td><td>${c.admitted}</td><td>${c.completed}</td></tr>`
+            ).join("");
+            const recent = data.recent.slice(0, 15).map(r =>
+              `<tr><td><code>${r.job_class}</code></td><td>${r.account_id || "—"}</td><td>${new Date(r.ran_at).toLocaleTimeString()}</td></tr>`
+            ).join("") || "<tr><td colspan='3' class='muted'>Nothing yet.</td></tr>";
+            return `
+              <span class="updated">updated ${new Date().toLocaleTimeString()}</span>
+              <h2>Live status</h2>
+              <div class="two-col">
+                <div>
+                  <table><thead><tr><th>Policy</th><th>Pending</th><th>Admitted</th><th>Completed (24h)</th></tr></thead><tbody>${counts}</tbody></table>
+                </div>
+                <div>
+                  <table><thead><tr><th>Job</th><th>Account</th><th>Ran at</th></tr></thead><tbody>${recent}</tbody></table>
+                </div>
+              </div>`;
+          }
+        };
+
+        function refreshOne(el) {
+          const url = el.dataset.poll;
+          const renderer = renderers[el.dataset.renderer] || (d => JSON.stringify(d));
+          fetch(url, { headers: { "Accept": "application/json" } })
+            .then(r => r.json())
+            .then(data => { el.innerHTML = renderer(data); });
+        }
+        function refreshAll() {
+          document.querySelectorAll("[data-poll]").forEach(refreshOne);
+        }
+        refreshAll();
+        setInterval(refreshAll, 2000);
+      })();
+    </script>
   </body>
 </html>

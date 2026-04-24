@@ -25,9 +25,13 @@ class DispatchesController < ApplicationController
 
     enqueue_jobs(job_class, count, args, wait_sec, batch)
 
-    redirect_to root_path,
-      notice: "Enqueued #{count} #{job_class.name}#{batch ? ' (batch)' : ''} " \
+    message = "Enqueued #{count} #{job_class.name}#{batch ? ' (batch)' : ''} " \
               "for account=#{account_id}#{wait_sec.positive? ? " (wait #{wait_sec}s)" : ''}"
+
+    respond_to do |format|
+      format.html { redirect_to root_path, notice: message }
+      format.json { render json: { notice: message } }
+    end
   end
 
   private

@@ -26,5 +26,22 @@ class HomeController < ApplicationController
         completed: scope.completed.where(completed_at: 24.hours.ago..).count
       }
     end
+
+    respond_to do |format|
+      format.html
+      format.json do
+        render json: {
+          counts: @counts,
+          recent: @recent.map { |r|
+            {
+              job_class:  r.job_class,
+              account_id: r.account_id,
+              payload:    r.payload,
+              ran_at:     r.ran_at&.iso8601
+            }
+          }
+        }
+      end
+    end
   end
 end

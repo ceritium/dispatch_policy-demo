@@ -1,5 +1,7 @@
 <h1>DispatchPolicy playground</h1>
-<p class="muted">Every form below enqueues jobs through the gem. Tweak numbers, watch the admin panel drain the queue under the declared gates.</p>
+<p class="muted">Every form below enqueues jobs through the gem. Tweak numbers, watch the live panel drain the queue under the declared gates.</p>
+
+<div class="live-panel" data-poll="/stats.json" data-renderer="live-stats">Loading…</div>
 
 <%= render "dispatch_form",
   title:   "EmailJob — throttle + dedupe",
