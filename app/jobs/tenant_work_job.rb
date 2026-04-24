@@ -21,18 +21,17 @@ class TenantWorkJob < ApplicationJob
     gate :adaptive_concurrency,
          partition_by:   ->(ctx) { ctx[:account_id] },
          initial_max:    3,
-         min:            1,
-         max:            20,
          target_latency: 300  # ms
   end
 
   def perform(account_id:, task:)
-    latency = SIMULATED_LATENCY_MS.fetch(account_id, 200)
-    sleep(latency / 1000.0)
+    latency_ms = 300
+    # sleep(latency_ms / 1000.0)
+    sleep(0.2)
     JobRun.create!(
       job_class:  self.class.name,
       account_id: account_id,
-      payload:    { task: task, latency_ms: latency },
+      payload:    { task: task, latency_ms: latency_ms },
       ran_at:     Time.current
     )
   end
