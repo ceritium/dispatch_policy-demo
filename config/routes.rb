@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   get  "stats", to: "home#stats"
 
   resources :dispatches, only: [ :create ]
+  resources :storms,     only: [ :create ]
 
   mount DispatchPolicy::Engine => "/dispatch_policy"
   mount GoodJob::Engine => "/good_job"

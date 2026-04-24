@@ -30,3 +30,29 @@
   kind:    "maintenance",
   fields:  %i[task count wait batch],
   accounts: @accounts %>
+
+<%= form_with url: storms_path, method: :post, local: true, html: { class: "dispatch" } do |f| %>
+  <h3>Storm — stress test with many accounts</h3>
+  <p class="desc">
+    For <em>duration</em> seconds, enqueue TenantWorkJob for many distinct
+    <code>acc_1</code>..<code>acc_N</code> accounts with weight = account number
+    (so higher-numbered accounts are proportionally more likely).
+    Exercises the admin UI, round-robin fairness, and the adaptive gate with
+    hundreds of partitions and a skewed distribution.
+  </p>
+  <div class="fields">
+    <label>
+      num_accounts
+      <%= f.number_field :num_accounts, value: 100, min: 1, max: 2000 %>
+    </label>
+    <label>
+      duration (s)
+      <%= f.number_field :duration_seconds, value: 60, min: 1, max: 600 %>
+    </label>
+    <label>
+      batch_size
+      <%= f.number_field :batch_size, value: 20, min: 1, max: 200 %>
+    </label>
+    <button type="submit">Start storm</button>
+  </div>
+<% end %>
