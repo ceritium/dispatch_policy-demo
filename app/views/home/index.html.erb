@@ -18,8 +18,8 @@
   accounts: @accounts %>
 
 <%= render "dispatch_form",
-  title:   "TenantWorkJob — round_robin_by",
-  desc:    "No gate, max throughput. round_robin_by keeps small tenants unblocked when a big one dumps a burst.",
+  title:   "TenantWorkJob — round_robin_by + adaptive_concurrency",
+  desc:    "Fair tenant fetch + a cap that shrinks when the tenant's performs are slow. Account A = 100ms, B = 400ms, C = 900ms; watch A's cap grow toward 20 while C's shrinks toward 1.",
   kind:    "tenant_work",
   fields:  %i[account task count wait batch],
   accounts: @accounts %>

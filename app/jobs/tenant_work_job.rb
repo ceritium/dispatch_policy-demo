@@ -1,10 +1,14 @@
 # frozen_string_literal: true
 
-# No gates — max throughput. round_robin_by guarantees that even a tenant
-# dumping thousands of jobs can't starve others: the LATERAL batch gives
-# each active account up to round_robin_quantum rows per tick.
+# Combines round_robin_by (fairness across tenants at fetch time) with
+# adaptive_concurrency (backpressure per tenant at admission time). The cap
+# per account shrinks when that account's performs run slow or fail and
+# grows back when they recover.
 class TenantWorkJob < ApplicationJob
   include DispatchPolicy::Dispatchable
+
+  # Fake per-account latency so the feedback loop has something to react to.
+  SIMULATED_LATENCY_MS = { "A" => 100, "B" => 400, "C" => 900 }.freeze
 
   dispatch_policy do
     context ->(args) {
@@ -13,14 +17,22 @@ class TenantWorkJob < ApplicationJob
     }
 
     round_robin_by ->(args) { (args.first || {})[:account_id] }
+
+    gate :adaptive_concurrency,
+         partition_by:   ->(ctx) { ctx[:account_id] },
+         initial_max:    3,
+         min:            1,
+         max:            20,
+         target_latency: 300  # ms
   end
 
   def perform(account_id:, task:)
-    sleep 0.2
+    latency = SIMULATED_LATENCY_MS.fetch(account_id, 200)
+    sleep(latency / 1000.0)
     JobRun.create!(
       job_class:  self.class.name,
       account_id: account_id,
-      payload:    { task: task },
+      payload:    { task: task, latency_ms: latency },
       ran_at:     Time.current
     )
   end
