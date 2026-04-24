@@ -38,13 +38,16 @@ class DispatchesController < ApplicationController
 
   def enqueue_jobs(klass, count, args, wait_sec, batch)
     wait_until = wait_sec.positive? ? Time.current + wait_sec : nil
+    # Per-request salt so repeated submits don't collide with each other on
+    # the dedupe index. Each row inside this submit is still distinct via i.
+    salt = SecureRandom.hex(3)
 
     if batch
-      jobs = count.times.map { |i| klass.new(**varied_args(args, i)) }
+      jobs = count.times.map { |i| klass.new(**varied_args(args, i, salt)) }
       ActiveJob.perform_all_later(jobs)
     else
       count.times do |i|
-        kw = varied_args(args, i)
+        kw = varied_args(args, i, salt)
         if wait_until
           klass.set(wait_until: wait_until).perform_later(**kw)
         else
@@ -54,14 +57,17 @@ class DispatchesController < ApplicationController
     end
   end
 
-  # Make each enqueue unique so dedupe doesn't collapse the whole burst into
-  # one. Picks the kwarg that's part of the dedupe key per job class.
-  def varied_args(args, i)
+  # Suffix the dedupe-bearing field with `<salt>-<i>` so each submit produces
+  # a fresh set of keys. To *see* dedupe in action, pass an explicit subject
+  # the same twice — when the first pending row is still around, a batch
+  # re-submit with the same (account, subject) collapses.
+  def varied_args(args, i, salt)
+    suffix = "#{salt}-#{i}"
     case
-    when args.key?(:subject)   then args.merge(subject: "#{args[:subject]} ##{i}")
-    when args.key?(:report_id) then args.merge(report_id: "#{args[:report_id]}-#{i}")
-    when args.key?(:task)      then args.merge(task: "#{args[:task]}-#{i}")
-    when args.key?(:name)      then args.merge(name: "#{args[:name]}-#{i}")
+    when args.key?(:subject)   then args.merge(subject: "#{args[:subject]} (#{suffix})")
+    when args.key?(:report_id) then args.merge(report_id: "#{args[:report_id]}-#{suffix}")
+    when args.key?(:task)      then args.merge(task: "#{args[:task]}-#{suffix}")
+    when args.key?(:name)      then args.merge(name: "#{args[:name]}-#{suffix}")
     else args
     end
   end
