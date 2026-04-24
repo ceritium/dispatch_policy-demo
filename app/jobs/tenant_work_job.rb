@@ -20,7 +20,7 @@ class TenantWorkJob < ApplicationJob
     gate :adaptive_concurrency,
          partition_by:  ->(ctx) { ctx[:account_id] },
          initial_max:   3,
-         target_lag_ms: 100
+         target_lag_ms: 5000
   end
 
   def perform(account_id:, task:)

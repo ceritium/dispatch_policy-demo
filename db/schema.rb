@@ -14,6 +14,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_083947) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
+  create_table "dispatch_policy_adaptive_concurrency_samples", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "current_max", null: false
+    t.float "ewma_latency_ms", default: 0.0, null: false
+    t.string "gate_name", null: false
+    t.datetime "minute_bucket", null: false
+    t.string "partition_key", null: false
+    t.string "policy_name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["minute_bucket"], name: "idx_dp_adaptive_concurrency_samples_time"
+    t.index ["policy_name", "gate_name", "partition_key", "minute_bucket"], name: "idx_dp_adaptive_concurrency_samples_unique", unique: true
+  end
+
   create_table "dispatch_policy_adaptive_concurrency_stats", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "current_max", null: false
