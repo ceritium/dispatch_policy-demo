@@ -38,6 +38,8 @@ bin/rails s
 
 # Terminal 2 — worker (also runs the cron for the tick safety net)
 bundle exec good_job start
+# To also see ActiveRecord queries in the worker's stdout:
+# RAILS_LOG_TO_STDOUT=1 bundle exec good_job start
 ```
 
 Visit http://localhost:3000.
