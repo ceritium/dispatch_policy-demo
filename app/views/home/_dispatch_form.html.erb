@@ -1,0 +1,44 @@
+<%= form_with url: dispatches_path, method: :post, local: true, html: { class: "dispatch" } do |f| %>
+  <%= f.hidden_field :kind, value: kind %>
+  <h3><%= title %></h3>
+  <p class="desc"><%= desc %></p>
+  <div class="fields">
+    <% if fields.include?(:account) %>
+      <label>
+        account_id
+        <%= f.select :account_id, accounts %>
+      </label>
+    <% end %>
+    <% if fields.include?(:subject) %>
+      <label>
+        subject
+        <%= f.text_field :subject, value: "Daily update" %>
+      </label>
+    <% end %>
+    <% if fields.include?(:task) %>
+      <label>
+        task / name
+        <%= f.text_field :task, value: "process" %>
+      </label>
+    <% end %>
+    <% if fields.include?(:count) %>
+      <label>
+        count
+        <%= f.number_field :count, value: 10, min: 1, max: 500 %>
+      </label>
+    <% end %>
+    <% if fields.include?(:wait) %>
+      <label>
+        wait (s)
+        <%= f.number_field :wait_seconds, value: 0, min: 0 %>
+      </label>
+    <% end %>
+    <% if fields.include?(:batch) %>
+      <label style="flex-direction: row; align-items: center; gap: 0.4em;">
+        <%= f.check_box :batch, {}, "1", "0" %>
+        perform_all_later
+      </label>
+    <% end %>
+    <button type="submit">Enqueue</button>
+  </div>
+<% end %>

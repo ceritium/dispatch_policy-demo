@@ -1,0 +1,30 @@
+<h1>DispatchPolicy playground</h1>
+<p class="muted">Every form below enqueues jobs through the gem. Tweak numbers, watch the admin panel drain the queue under the declared gates.</p>
+
+<%= render "dispatch_form",
+  title:   "EmailJob — throttle + dedupe",
+  desc:    "rate: 5/minute per account, dedupe on (account, subject). Enqueue 20 to watch it drain at ~1/12s.",
+  kind:    "email",
+  fields:  %i[account subject count wait batch],
+  accounts: @accounts %>
+
+<%= render "dispatch_form",
+  title:   "ReportJob — concurrency + fair_interleave",
+  desc:    "Max 2 in-flight per account, fair_interleave mixes accounts in the admission order.",
+  kind:    "report",
+  fields:  %i[account count wait batch],
+  accounts: @accounts %>
+
+<%= render "dispatch_form",
+  title:   "TenantWorkJob — round_robin_by",
+  desc:    "No gate, max throughput. round_robin_by keeps small tenants unblocked when a big one dumps a burst.",
+  kind:    "tenant_work",
+  fields:  %i[account task count wait batch],
+  accounts: @accounts %>
+
+<%= render "dispatch_form",
+  title:   "MaintenanceJob — global_cap",
+  desc:    "At most 3 running at a time across the whole policy. No per-tenant partition.",
+  kind:    "maintenance",
+  fields:  %i[task count wait batch],
+  accounts: @accounts %>

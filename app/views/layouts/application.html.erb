@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DispatchPolicy Demo</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= yield :head %>
+    <style>
+      body { font-family: -apple-system, system-ui, sans-serif; max-width: 1100px; margin: 1.5em auto; padding: 0 1em; color: #222; }
+      h1 { font-size: 1.5em; margin-bottom: 0.25em; }
+      h2 { font-size: 1.15em; margin: 1.5em 0 0.5em; border-bottom: 1px solid #ddd; padding-bottom: 0.2em; }
+      nav { margin-bottom: 1.5em; }
+      nav a { margin-right: 1em; text-decoration: none; color: #0057b7; }
+      table { border-collapse: collapse; width: 100%; margin-top: 0.5em; }
+      th, td { text-align: left; padding: 0.4em 0.6em; border-bottom: 1px solid #eee; }
+      th { font-size: 0.8em; text-transform: uppercase; color: #666; letter-spacing: 0.02em; }
+      form.dispatch { background: #f7f7fa; border: 1px solid #ddd; border-radius: 6px; padding: 0.8em 1em; margin-bottom: 1em; }
+      form.dispatch h3 { margin: 0 0 0.3em; font-size: 1em; }
+      form.dispatch .desc { color: #666; font-size: 0.85em; margin-bottom: 0.6em; }
+      form.dispatch .fields { display: flex; gap: 0.8em; flex-wrap: wrap; align-items: end; }
+      form.dispatch label { display: flex; flex-direction: column; font-size: 0.8em; color: #444; }
+      form.dispatch input, form.dispatch select { font: inherit; padding: 0.3em 0.4em; border: 1px solid #ccc; border-radius: 3px; min-width: 5em; }
+      form.dispatch button { font: inherit; padding: 0.5em 1em; border: 0; background: #0057b7; color: #fff; border-radius: 3px; cursor: pointer; }
+      form.dispatch button:hover { background: #003d80; }
+      .flash { padding: 0.6em 0.8em; border-radius: 4px; margin-bottom: 1em; }
+      .flash.notice { background: #e6f4ea; color: #226335; border: 1px solid #c5e1cd; }
+      .flash.alert  { background: #fde7e7; color: #8b2020; border: 1px solid #f2b8b8; }
+      .muted { color: #888; }
+      code { background: #f0f0f3; padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.9em; }
+      .two-col { display: flex; gap: 2em; flex-wrap: wrap; }
+      .two-col > div { flex: 1; min-width: 320px; }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <%= link_to "Enqueue jobs", root_path %>
+      <%= link_to "Stats", stats_path %>
+      <%= link_to "DispatchPolicy admin", dispatch_policy_path %>
+      <%= link_to "GoodJob dashboard", good_job_path %>
+    </nav>
+
+    <% flash.each do |key, msg| %>
+      <div class="flash <%= key %>"><%= msg %></div>
+    <% end %>
+
+    <%= yield %>
+  </body>
+</html>
