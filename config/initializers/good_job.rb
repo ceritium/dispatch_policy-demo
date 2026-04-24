@@ -6,7 +6,7 @@ Rails.application.config.good_job.enable_cron = true
 Rails.application.config.good_job.cron = {
   dispatch_policy_tick: {
     cron: "*/10 * * * * *",
-    class: "DispatchPolicy::DispatchTickLoopJob",
+    class: "DispatchTickLoopJob",
     description: "Safety-net enqueue for the DispatchPolicy tick loop (self-chains in normal operation)."
   }
 }
