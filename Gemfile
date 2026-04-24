@@ -12,8 +12,8 @@ gem "puma", ">= 5.0"
 # Queue adapter with cron support
 gem "good_job", "~> 4.13"
 
-# The gem under test — local path.
-gem "dispatch_policy", path: "../dispatch_policy"
+# The gem under test.
+gem "dispatch_policy", github: "ceritium/dispatch_policy"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
