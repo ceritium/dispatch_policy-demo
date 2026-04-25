@@ -42,7 +42,7 @@ class WebhookDeliveryJob < ApplicationJob
     gate :adaptive_concurrency,
          partition_by:  ->(ctx) { ctx[:account_id] },
          initial_max:   3,
-         target_lag_ms: 500
+         target_lag_ms: 2000
   end
 
   def perform(account_id:, **)

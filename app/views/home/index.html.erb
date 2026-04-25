@@ -24,7 +24,7 @@
 
 <%= render "dispatch_form",
   title:   "WebhookDeliveryJob — round_robin_by weight: :time",
-  desc:    "Time-weighted fetch. Each account has a fixed perform duration (fast=50ms, medium=200ms, slow=1s). Solo: it runs at full throughput. Multi: per-tick quanta are sized inverse to recent compute time — slow gets fewer, fast gets more — and total compute stays balanced without a throttle.",
+  desc:    "Time-weighted fetch + adaptive_concurrency drip-feed. Each account has a fixed perform duration (fast=100ms, medium=500ms, slow=1s). Admission paces per account based on adapter queue lag; the time-weighted fetch balances compute time across competing accounts.",
   kind:    "webhook",
   fields:  %i[account count wait batch],
   accounts: @webhook_accounts %>
