@@ -29,17 +29,13 @@ class WebhookDeliveryJob < ApplicationJob
       { account_id: opts[:account_id] }
     }
 
-    # 60 deliveries/min/account is the absolute ceiling.
-    # gate :throttle,
-    #      rate:         60,
-    #      per:          1.minute,
-    #      partition_by: ->(ctx) { ctx[:account_id] }
-
-    # Bias admission ordering toward whichever account has consumed the
-    # least compute time in the last 60s. Solo accounts are unaffected.
-    gate :fair_time_share,
-         partition_by: ->(ctx) { ctx[:account_id] },
-         window:       60
+    # Time-weighted round-robin fetch. Solo accounts run flat-out
+    # (top-up fills the batch). When multiple accounts are active, each
+    # one's quantum is sized inversely to how much compute time it has
+    # used in the last 60s — slow accounts shrink, fast accounts grow,
+    # and total compute time stays balanced without a throttle.
+    round_robin_by ->(args) { (args.first || {})[:account_id] },
+                   weight: :time, window: 60
   end
 
   def perform(account_id:, **)

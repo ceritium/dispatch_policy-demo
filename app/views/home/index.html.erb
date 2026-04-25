@@ -23,8 +23,8 @@
   accounts: @accounts %>
 
 <%= render "dispatch_form",
-  title:   "WebhookDeliveryJob — throttle + fair_time_share",
-  desc:    "Throttle 60/min/account is the ceiling. fair_time_share rebalances admission ordering by recent compute time. Each account has a fixed perform duration (fast=50ms, medium=200ms, slow=1s). Enqueue from one account: it runs at the throttle ceiling. Add a second account: both share total compute time — the slow one gets fewer admissions, the fast one gets more.",
+  title:   "WebhookDeliveryJob — round_robin_by weight: :time",
+  desc:    "Time-weighted fetch. Each account has a fixed perform duration (fast=50ms, medium=200ms, slow=1s). Solo: it runs at full throughput. Multi: per-tick quanta are sized inverse to recent compute time — slow gets fewer, fast gets more — and total compute stays balanced without a throttle.",
   kind:    "webhook",
   fields:  %i[account count wait batch],
   accounts: @webhook_accounts %>
