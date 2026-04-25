@@ -45,7 +45,7 @@ namespace :screenshots do
     session.visit "/dispatch_policy"
     save.call("admin-index")
 
-    [ EmailJob, ReportJob, TenantWorkJob, MaintenanceJob ].each do |klass|
+    [ EmailJob, ReportJob, TenantWorkJob, WebhookDeliveryJob, MaintenanceJob ].each do |klass|
       policy_name = klass.resolved_dispatch_policy.name
       watched     = pick_watched_partitions(policy_name)
       query       = watched.any? ? "?watch=#{watched.join(',')}" : ""
