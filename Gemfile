@@ -38,4 +38,8 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+
+  # Headless browser screenshots for the README — see lib/tasks/screenshots.rake
+  gem "capybara"
+  gem "selenium-webdriver"
 end

@@ -58,6 +58,21 @@ Visit http://localhost:3000.
 - Each job class writes a row to `job_runs` from `perform`, giving the
   stats page something concrete to show.
 
+## Screenshots
+
+`screenshots/` holds retina captures of the playground and the gem's
+admin UI. Regenerate them with:
+
+```bash
+bin/rails screenshots:capture
+```
+
+The task seeds a believable mix of completed/pending state through the
+real DispatchPolicy admission flow (so sparklines and counters aren't
+empty) and writes PNGs into `screenshots/`. It uses headless Chrome via
+Capybara + Selenium (dev-only gems) — Selenium Manager auto-downloads
+chromedriver, you only need Chrome installed locally.
+
 ## Try these demos
 
 | Scenario | How |
