@@ -16,9 +16,9 @@ class WebhookDeliveryJob < ApplicationJob
 
   # Deterministic per-account latency. Pick from this set in the form.
   ACCOUNT_LATENCIES_MS = {
-    "fast"   => 50,
-    "medium" => 200,
-    "slow"   => 1_000
+    "fast"   => 100,
+    "medium" => 500,
+    "slow"   => 1000
   }.freeze
 
   include DispatchPolicy::Dispatchable
@@ -29,13 +29,20 @@ class WebhookDeliveryJob < ApplicationJob
       { account_id: opts[:account_id] }
     }
 
-    # Time-weighted round-robin fetch. Solo accounts run flat-out
-    # (top-up fills the batch). When multiple accounts are active, each
-    # one's quantum is sized inversely to how much compute time it has
-    # used in the last 60s — slow accounts shrink, fast accounts grow,
-    # and total compute time stays balanced without a throttle.
+    # Time-weighted round-robin fetch: balances compute time across
+    # accounts at the SELECT layer when multiple accounts are active.
     round_robin_by ->(args) { (args.first || {})[:account_id] },
                    weight: :time, window: 60
+
+    # Drip-feed per account based on adapter queue lag. With a fast
+    # account (100ms perform) and target_lag_ms 500, the cap grows
+    # comfortably; with a slow account (1s perform) it shrinks toward
+    # min so we don't pile 500 jobs into GoodJob and lose the ability
+    # to react to performance changes mid-burst.
+    gate :adaptive_concurrency,
+         partition_by:  ->(ctx) { ctx[:account_id] },
+         initial_max:   3,
+         target_lag_ms: 500
   end
 
   def perform(account_id:, **)
