@@ -82,6 +82,7 @@ partitions:
 Other per-policy pages:
 [email_job](screenshots/admin-policy-email_job.png) ·
 [report_job](screenshots/admin-policy-report_job.png) ·
+[webhook_delivery_job](screenshots/admin-policy-webhook_delivery_job.png) ·
 [maintenance_job](screenshots/admin-policy-maintenance_job.png).
 
 Regenerate everything with:
