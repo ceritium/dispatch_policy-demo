@@ -60,8 +60,30 @@ Visit http://localhost:3000.
 
 ## Screenshots
 
-`screenshots/` holds retina captures of the playground and the gem's
-admin UI. Regenerate them with:
+The playground (`/`) — one form per gate, plus a Storm form for stress runs:
+
+![Playground](screenshots/home.png)
+
+The live `/stats` page — counts per policy and the most recent completions:
+
+![Stats](screenshots/stats.png)
+
+The gem's admin index, mounted at `/dispatch_policy`:
+
+![Admin index](screenshots/admin-index.png)
+
+A policy detail page — pending/admitted/completed totals, EWMA queue-lag
+chart, watched partitions with sparklines, and a searchable list of all
+partitions:
+
+![TenantWorkJob admin](screenshots/admin-policy-tenant_work_job.png)
+
+Other per-policy pages:
+[email_job](screenshots/admin-policy-email_job.png) ·
+[report_job](screenshots/admin-policy-report_job.png) ·
+[maintenance_job](screenshots/admin-policy-maintenance_job.png).
+
+Regenerate everything with:
 
 ```bash
 bin/rails screenshots:capture
