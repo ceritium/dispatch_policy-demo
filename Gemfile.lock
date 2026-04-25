@@ -1,6 +1,7 @@
 GIT
   remote: https://github.com/ceritium/dispatch_policy.git
-  revision: 48055c3a49c623d11157a0b5706de6d48b7c6da1
+  revision: 262076db5e113c0392950199a59d1884ce0a29ae
+  branch: time-gates
   specs:
     dispatch_policy (0.1.0)
       activejob (>= 7.1)

@@ -2,16 +2,19 @@
 
 class HomeController < ApplicationController
   ACCOUNTS = %w[A B C].freeze
+  WEBHOOK_ACCOUNTS = WebhookDeliveryJob::ACCOUNT_LATENCIES_MS.keys.freeze
 
   JOB_CLASSES = [
     EmailJob,
     ReportJob,
     TenantWorkJob,
+    WebhookDeliveryJob,
     MaintenanceJob
   ].freeze
 
   def index
-    @accounts = ACCOUNTS
+    @accounts         = ACCOUNTS
+    @webhook_accounts = WEBHOOK_ACCOUNTS
   end
 
   def stats

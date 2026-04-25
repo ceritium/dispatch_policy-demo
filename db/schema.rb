@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_24_083947) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_25_153838) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,11 +40,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_24_083947) do
   create_table "dispatch_policy_partition_observations", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "current_max"
+    t.integer "max_duration_ms", default: 0, null: false
     t.integer "max_lag_ms", default: 0, null: false
     t.datetime "minute_bucket", null: false
     t.integer "observation_count", default: 0, null: false
     t.string "partition_key", null: false
     t.string "policy_name", null: false
+    t.bigint "total_duration_ms", default: 0, null: false
     t.bigint "total_lag_ms", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["minute_bucket"], name: "idx_dp_partition_observations_time"

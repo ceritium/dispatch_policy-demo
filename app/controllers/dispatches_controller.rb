@@ -17,6 +17,8 @@ class DispatchesController < ApplicationController
                         [ ReportJob, { account_id: account_id, report_id: SecureRandom.hex(4) } ]
                       when "tenant_work"
                         [ TenantWorkJob, { account_id: account_id, task: task } ]
+                      when "webhook"
+                        [ WebhookDeliveryJob, { account_id: account_id } ]
                       when "maintenance"
                         [ MaintenanceJob, { name: task } ]
                       else

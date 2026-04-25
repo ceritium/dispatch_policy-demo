@@ -23,6 +23,13 @@
   accounts: @accounts %>
 
 <%= render "dispatch_form",
+  title:   "WebhookDeliveryJob — throttle + fair_time_share",
+  desc:    "Throttle 60/min/account is the ceiling. fair_time_share rebalances admission ordering by recent compute time. Each account has a fixed perform duration (fast=50ms, medium=200ms, slow=1s). Enqueue from one account: it runs at the throttle ceiling. Add a second account: both share total compute time — the slow one gets fewer admissions, the fast one gets more.",
+  kind:    "webhook",
+  fields:  %i[account count wait batch],
+  accounts: @webhook_accounts %>
+
+<%= render "dispatch_form",
   title:   "MaintenanceJob — global_cap",
   desc:    "At most 3 running at a time across the whole policy. No per-tenant partition.",
   kind:    "maintenance",
