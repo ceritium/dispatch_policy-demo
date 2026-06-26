@@ -10,7 +10,7 @@ gem "pg", "~> 1.1"
 gem "puma", ">= 5.0"
 
 # Queue adapter with cron support
-gem "good_job", "~> 4.13"
+gem "good_job", "~> 4.19"
 
 # The gem under test.
 gem "dispatch_policy", github: "ceritium/dispatch_policy"
